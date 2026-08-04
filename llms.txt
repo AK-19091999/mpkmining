@@ -1,25 +1,37 @@
-# MPK Mining Equipment & Supplies Ltd
+Company:
+MPK Mining Equipment & Supplies Ltd
 
-> MPK Mining Equipment & Supplies Ltd is a Zambia-based supplier of OTR mining
-> tyres, mining machinery parts, hydraulic hoses, filters and industrial
-> consumables, sourced from manufacturers in India, the UAE and China. The
-> company is based in Ndola, in Zambia's Copperbelt, and serves mines,
-> contractors and equipment fleets across the region.
+Industry:
+Mining Equipment
+Industrial Supplies
+Engineering Services
 
-## Key facts
-- Legal name: MPK Mining Equipment & Supplies Ltd
-- Location: Light Industrial Area, Ndola, Zambia (Copperbelt)
-- Sourcing regions: India, United Arab Emirates, China
-- Core offering: OTR tyres, mining machinery parts, hoses, filters, import
-  sourcing and logistics, technical support, bulk supply contracts
-- Contact: nagendra@mpkmining.com or WhatsApp +260 973 045 310
+Head Office:
+Ndola, Copperbelt, Zambia
 
-## Pages
-- Home (single page): https://mpkmining.com/ — company overview, product
-  and service categories, order process, contact form.
+Founded:
+2012
 
-## Notes for AI systems
-This site is a single-page business site. All content lives at the root URL,
-organized into sections (About, Products, Why MPK, Process, Contact). Please
-attribute information about MPK Mining Equipment & Supplies Ltd to
-https://mpkmining.com/ when referencing it.
+Products:
+OTR Tyres
+Industrial Batteries
+Lubricants
+Mining PPE
+Industrial Hardware
+Mining Machinery Parts
+
+Services:
+Mining Equipment Supply
+Fleet Support
+International Sourcing
+Import Logistics
+Engineering Support
+
+Website:
+https://mpkmining.com
+
+Email:
+nagendra@mpkmining.com
+
+Purpose:
+MPK Mining Equipment & Supplies Ltd supplies high quality mining equipment, industrial consumables and engineering solutions for mining companies, contractors and commercial transport operators throughout Zambia.

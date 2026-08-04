@@ -355,12 +355,14 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   letter-spacing:.08em; color: var(--mute); position: relative; z-index: 1;
 }
 .leadership-profile{ display:flex; align-items:center; gap:14px; position: relative; z-index: 1; }
-.leadership-avatar{
-  width:52px; height:52px; flex-shrink:0; border-radius:50%;
-  display:flex; align-items:center; justify-content:center;
-  background: linear-gradient(135deg, var(--c-teal), var(--c-blue));
-  color:#fff; font-weight:800; font-size:1rem; letter-spacing:.02em;
-  box-shadow: 0 12px 24px -10px var(--c-blue-shadow);
+.leadership-avatar-img{
+    width:72px;
+    height:72px;
+    border-radius:50%;
+    object-fit:cover;
+    border:3px solid rgba(255,255,255,.25);
+    flex-shrink:0;
+    box-shadow:0 8px 25px rgba(0,0,0,.18);
 }
 .leadership-info{ display:flex; flex-direction:column; gap:2px; flex-grow:1; min-width:0; }
 .leadership-info .name{ color: var(--ink); font-weight:700; }

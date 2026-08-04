@@ -346,7 +346,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 .section-head h2{ font-size: clamp(1.6rem, 2.8vw, 2.3rem); }
 .section-sub{ font-size:1rem; }
 
-.about-grid{ display:grid; grid-template-columns: .8fr 1.2fr; gap: 48px; }
+.about-grid{ display:grid; grid-template-columns: .8fr 1.2fr; }
 .about-body p{ max-width: 62ch; }
 
 .leadership{ padding: 26px 28px; margin-top: 22px; max-width: 440px; }

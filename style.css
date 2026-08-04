@@ -376,8 +376,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 }
 
 .leadership-avatar{
-    width:52px;
-    height:52px;
+    width:70px;
+    height:70px;
     flex-shrink:0;
     display:block;
     object-fit:cover;

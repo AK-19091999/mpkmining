@@ -1,18 +1,26 @@
 (function () {
   "use strict";
 
-  /* ---------- Scroll reveal + header + counters ----------
-     Placed first and wrapped defensively so a later error elsewhere
-     in this file (e.g. form handling) can never leave content hidden. */
+  var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- Scroll progress bar + header + reveal + counters ----------
+     Wrapped defensively so a later error can never leave content hidden. */
   try {
     var siteHeader = document.querySelector(".site-header");
-    if (siteHeader) {
-      var onScrollHeader = function () {
-        siteHeader.classList.toggle("scrolled", window.scrollY > 12);
-      };
-      onScrollHeader();
-      window.addEventListener("scroll", onScrollHeader, { passive: true });
-    }
+    var progressBar = document.getElementById("scrollProgress");
+
+    var onScrollHeader = function () {
+      if (siteHeader) siteHeader.classList.toggle("scrolled", window.scrollY > 12);
+      if (progressBar) {
+        var doc = document.documentElement;
+        var max = (doc.scrollHeight || document.body.scrollHeight) - doc.clientHeight;
+        var pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+        progressBar.style.width = pct + "%";
+      }
+    };
+    onScrollHeader();
+    window.addEventListener("scroll", onScrollHeader, { passive: true });
+    window.addEventListener("resize", onScrollHeader, { passive: true });
 
     var revealEls = document.querySelectorAll(".reveal");
     var forceRevealAll = function () {
@@ -90,7 +98,6 @@
       }
     }
   } catch (e) {
-    // If anything above fails, never let it leave content invisible.
     var fallbackReveal = document.querySelectorAll(".reveal");
     for (var f = 0; f < fallbackReveal.length; f++) {
       fallbackReveal[f].classList.add("in-view");
@@ -119,175 +126,95 @@
         navToggle.setAttribute("aria-expanded", "false");
       });
     });
-  }
 
-  var modalOverlay = document.getElementById("modalOverlay");
-  var modalClose = document.getElementById("modalClose");
-  var modalOkBtn = document.getElementById("modalOkBtn");
-
-  var contactModalOverlay = document.getElementById("contactModalOverlay");
-
-  var validators = {
-    name: function (v) {
-      return /^[A-Za-z\s.'-]{2,80}$/.test(v.trim());
-    },
-    mobile: function (v) {
-      return /^[0-9+\s().-]{7,16}$/.test(v.trim());
-    },
-    email: function (v) {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()) && v.trim().length <= 120;
-    },
-    message: function (v) {
-      var t = v.trim();
-      return t.length >= 10 && t.length <= 2000;
-    }
-  };
-
-  function openModal() {
-    if (!modalOverlay) return;
-    modalOverlay.hidden = false;
-    document.body.style.overflow = "hidden";
-    if (modalOkBtn) modalOkBtn.focus();
-  }
-
-  // Closing the thank-you popup (X, "Done", or a tap/click outside it)
-  // refreshes the landing page, giving the visitor a clean, empty form.
-  function closeModal() {
-    if (!modalOverlay) return;
-    window.location.reload();
-  }
-
-  if (modalClose) modalClose.addEventListener("click", closeModal);
-  if (modalOkBtn) modalOkBtn.addEventListener("click", closeModal);
-  if (modalOverlay) {
-    modalOverlay.addEventListener("click", function (e) {
-      if (e.target === modalOverlay) closeModal();
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && siteNav.classList.contains("open")) {
+        siteNav.classList.remove("open");
+        navToggle.classList.remove("open");
+        navToggle.setAttribute("aria-expanded", "false");
+      }
     });
   }
 
-  function openContactModal() {
-    if (!contactModalOverlay) return;
-    contactModalOverlay.hidden = false;
-    document.body.style.overflow = "hidden";
-    var firstField = contactModalOverlay.querySelector('[name="name"]');
-    if (firstField) firstField.focus();
-  }
+  /* ---------- Interactive tilt + cursor-glow for theme cards ----------
+     Pointer-driven 3D tilt with a light-follow glow. Skipped entirely on
+     touch devices (no hover) and when the user prefers reduced motion. */
+  var supportsHover = window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
-  function closeContactModal() {
-    if (!contactModalOverlay) return;
-    contactModalOverlay.hidden = true;
-    document.body.style.overflow = "";
-  }
-
-  document.querySelectorAll(".js-open-contact-modal").forEach(function (btn) {
-    btn.addEventListener("click", openContactModal);
-  });
-  document.querySelectorAll(".js-close-contact-modal").forEach(function (btn) {
-    btn.addEventListener("click", closeContactModal);
-  });
-  if (contactModalOverlay) {
-    contactModalOverlay.addEventListener("click", function (e) {
-      if (e.target === contactModalOverlay) closeContactModal();
+  if (supportsHover && !reduceMotion) {
+    var tiltEls = document.querySelectorAll(".tilt-card");
+    tiltEls.forEach(function (card) {
+      var bounds;
+      function onEnter() {
+        bounds = card.getBoundingClientRect();
+        card.classList.add("is-tilting");
+      }
+      function onMove(e) {
+        if (!bounds) bounds = card.getBoundingClientRect();
+        var px = (e.clientX - bounds.left) / bounds.width;
+        var py = (e.clientY - bounds.top) / bounds.height;
+        var rotateY = (px - 0.5) * 14;
+        var rotateX = (0.5 - py) * 14;
+        card.style.setProperty("--rx", rotateX.toFixed(2) + "deg");
+        card.style.setProperty("--ry", rotateY.toFixed(2) + "deg");
+        card.style.setProperty("--mx", (px * 100).toFixed(1) + "%");
+        card.style.setProperty("--my", (py * 100).toFixed(1) + "%");
+      }
+      function onLeave() {
+        card.classList.remove("is-tilting");
+        card.style.setProperty("--rx", "0deg");
+        card.style.setProperty("--ry", "0deg");
+      }
+      card.addEventListener("pointerenter", onEnter);
+      card.addEventListener("pointermove", onMove);
+      card.addEventListener("pointerleave", onLeave);
     });
   }
 
-  document.addEventListener("keydown", function (e) {
-    if (e.key !== "Escape") return;
-    if (modalOverlay && !modalOverlay.hidden) closeModal();
-    if (contactModalOverlay && !contactModalOverlay.hidden) closeContactModal();
-  });
+  /* ---------- Product / theme card filtering ---------- */
+  var filterBar = document.querySelector(".filter-tabs");
+  if (filterBar) {
+    var filterBtns = filterBar.querySelectorAll(".filter-tab");
+    var cards = document.querySelectorAll("[data-category]");
 
-  // Wires up validation + submit handling for one enquiry form. Fields are
-  // matched by their `name` attribute (not `id`), so the same logic works
-  // for both the main-page form and the mobile popup's copy of it, which
-  // use different element ids to stay unique on the page.
-  function initEnquiryForm(form) {
-    if (!form) return;
+    filterBtns.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var filter = btn.getAttribute("data-filter");
 
-    var fieldNames = ["name", "mobile", "email", "message"];
-    var formStatus = form.querySelector(".form-status");
-    var formTsField = form.querySelector('[name="form_ts"]');
-    var pageUrlField = form.querySelector('[name="page_url"]');
+        filterBtns.forEach(function (b) {
+          b.classList.toggle("active", b === btn);
+          b.setAttribute("aria-pressed", b === btn ? "true" : "false");
+        });
 
-    // Record the time the form became visible, used as a simple bot-speed trap.
-    if (formTsField) formTsField.value = String(Date.now());
-    if (pageUrlField) pageUrlField.value = window.location.href;
-
-    function fieldEl(name) {
-      return form.querySelector('[name="' + name + '"]');
-    }
-
-    function setFieldState(name, valid) {
-      var el = fieldEl(name);
-      var wrapper = el && el.closest(".field");
-      if (wrapper) wrapper.classList.toggle("invalid", !valid);
-    }
-
-    function validateField(name) {
-      var el = fieldEl(name);
-      if (!el) return true;
-      var valid = validators[name] ? validators[name](el.value) : true;
-      setFieldState(name, valid);
-      return valid;
-    }
-
-    fieldNames.forEach(function (name) {
-      var el = fieldEl(name);
-      if (!el) return;
-      el.addEventListener("blur", function () {
-        validateField(name);
-      });
-      el.addEventListener("input", function () {
-        var wrapper = el.closest(".field");
-        if (wrapper && wrapper.classList.contains("invalid")) validateField(name);
+        cards.forEach(function (card) {
+          var cats = (card.getAttribute("data-category") || "").split(" ");
+          var show = filter === "all" || cats.indexOf(filter) !== -1;
+          if (show) {
+            card.classList.remove("card-hidden");
+          } else {
+            card.classList.add("card-hidden");
+          }
+        });
       });
     });
-
-    function showStatus(message, type) {
-      if (!formStatus) return;
-      formStatus.textContent = message;
-      formStatus.className = "form-status" + (type ? " " + type : "");
-    }
-
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
-
-      // Honeypot check — if this hidden field has any value, silently drop.
-      var honeypot = fieldEl("company_website");
-      if (honeypot && honeypot.value.trim() !== "") {
-        showStatus("Thanks — your enquiry has been received.", "success");
-        form.reset();
-        return;
-      }
-
-      // Timing trap — genuine users take at least a couple of seconds.
-      var startedAt = Number((formTsField && formTsField.value) || 0);
-      if (startedAt && Date.now() - startedAt < 1500) {
-        showStatus("Please take a moment to review the form and try again.", "error");
-        return;
-      }
-
-      var allValid = fieldNames.map(validateField).every(Boolean);
-
-      if (!allValid) {
-        showStatus("Please correct the highlighted fields.", "error");
-        return;
-      }
-
-      // No email service is used — submitting simply confirms receipt with
-      // the on-page thank-you popup below. (If you later want a copy of
-      // enquiries emailed to you, this is the place to add that call back.)
-      showStatus("", "");
-      form.reset();
-      if (formTsField) formTsField.value = String(Date.now());
-      // If this was the popup form, close it before showing the
-      // "thank you" confirmation modal underneath.
-      if (contactModalOverlay && form.closest("#contactModalOverlay")) {
-        closeContactModal();
-      }
-      openModal();
-    });
   }
 
-  document.querySelectorAll(".js-enquiry-form").forEach(initEnquiryForm);
+  /* ---------- FAQ accordion ---------- */
+  var faqItems = document.querySelectorAll(".faq-item");
+  faqItems.forEach(function (item) {
+    var trigger = item.querySelector(".faq-q");
+    if (!trigger) return;
+    trigger.addEventListener("click", function () {
+      var isOpen = item.classList.contains("open");
+      faqItems.forEach(function (other) {
+        other.classList.remove("open");
+        var t = other.querySelector(".faq-q");
+        if (t) t.setAttribute("aria-expanded", "false");
+      });
+      if (!isOpen) {
+        item.classList.add("open");
+        trigger.setAttribute("aria-expanded", "true");
+      }
+    });
+  });
 })();
